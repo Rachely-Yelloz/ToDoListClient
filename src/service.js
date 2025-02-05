@@ -1,58 +1,55 @@
-import axios from 'axios';
+ import axios from 'axios';
 
-const apiUrl = process.env.REACT_APP_API_URL;
-const api = axios.create({
-  baseURL: apiUrl,
-});
+import config from './config';
 
-// הוספת interceptor לתפיסת שגיאות
-api.interceptors.response.use(
+
+axios.interceptors.response.use(
   response => {
-    // אם התגובה היא תקינה, מחזירים אותה
     return response;
   },
   error => {
-    // כאן תופסים את השגיאות
-    console.error("שגיאה בבקשה:", error.response ? error.response.data : error.message);
-    return Promise.reject(error); // מחזירים את השגיאה
+    console.error('API Error:', error); 
+    return Promise.reject(error); 
   }
 );
+
 export default {
   getTasks: async () => {
     try {
-      const result = await api.get('/items');    
+      const result = await axios.get(`${config.apiUrl}/items`);
       return result.data;
-    } catch (error) {
-      throw error; // טיפול בשגיאה יכול להתבצע כאן אם צריך
+    } catch (err) {
+      console.error("Error", err);
     }
   },
 
-  addTask: async(name) => {
+  addTask: async (name) => {
     console.log('addTask', name);
     try {
-      const result = await api.post('/items', { name });
-      return result.data;
-    } catch (error) {
-      throw error;
+      const result = await axios.post(`${config.apiUrl}/items`, { name: name, isComplete: false });
+      return result.data; 
+    } catch (err) {
+      console.error("Error", err);
     }
   },
 
-  setCompleted: async(id, isComplete) => {
+  setCompleted: async (id, isComplete) => {
     console.log('setCompleted', { id, isComplete });
     try {
-      const result = await api.put(`/items/${id}`, { Name: null, IsComplete: isComplete });
+      const result = await axios.put(`${config.apiUrl}/items/${id}`, { isComplete: isComplete });
       return result.data;
-    } catch (error) {
-      throw error;
+    } catch (err) {
+      console.error("Error", err);
     }
   },
 
-  deleteTask: async(id) => {
-    console.log('deleteTask', id);
+  deleteTask: async (id) => {
+    console.log('deleteTask');
     try {
-      await api.delete(`/items/${id}`);
-    } catch (error) {
-      throw error;
+      const result = await axios.delete(`${config.apiUrl}/items/${id}`);
+      return result.data;
+    } catch (err) {
+      console.error("Error", err);
     }
   }
 };
