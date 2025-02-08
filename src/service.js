@@ -16,6 +16,7 @@ export default {
   getTasks: async () => {
     try {
       const result = await axios.get(`${config.apiUrl}/items`);
+      
       return result.data;
     } catch (err) {
       console.error("Error", err);
